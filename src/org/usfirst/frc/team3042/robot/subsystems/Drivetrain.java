@@ -193,5 +193,66 @@ public class Drivetrain extends Subsystem {
 	private double rpmToInchesPerSecond(double rpm) {
 		return rotationsToInches(rpm) / 60;
 	}
+	
+	public void resetEncoders() {
+		leftEncoderZero = leftFrontMotor.getEncPosition();
+		rightEncoderZero = rightFrontMotor.getEncPosition();
+	}
+	
+	public void initMotionProfile() {
+		resetEncoders();
+		
+		leftFrontMotor.clearMotionProfileTrajectories();
+		rightFrontMotor.clearMotionProfileTrajectories();
+		
+		leftFrontMotor.setProfile(0);
+		rightFrontMotor.setProfile(0);
+		
+		leftFrontMotor.changeControlMode(TalonControlMode.MotionProfile);
+		rightFrontMotor.changeControlMode(TalonControlMode.MotionProfile);
+		leftFrontMotor.set(CANTalon.SetValueMotionProfile.Disable.value);
+		rightFrontMotor.set(CANTalon.SetValueMotionProfile.Disable.value);
+		
+		leftFrontMotor.clearMotionProfileHasUnderrun();
+		rightFrontMotor.clearMotionProfileHasUnderrun();
+	}
+	
+	public void removeUnderrunLeft() {
+		leftFrontMotor.clearMotionProfileHasUnderrun();
+	}
+	
+	public void removeUnderrunRight() {
+		rightFrontMotor.clearMotionProfileHasUnderrun();
+	}
+	
+	private double inchesToRotations(double inches) {
+		return inches / (Math.PI * WHEEL_DIAMETER_IN);
+	}
+	
+	private double inchesPerSecondToRPM(double inchesPerSecond) {
+		return inchesToRotations(inchesPerSecond * 60);
+	}
+	
+	public void enableMotionProfile() {
+		leftFrontMotor.set(CANTalon.SetValueMotionProfile.Enable.value);
+		rightFrontMotor.set(CANTalon.SetValueMotionProfile.Enable.value);
+	}
+	
+	public void holdMotionProfile() {
+		leftFrontMotor.set(CANTalon.SetValueMotionProfile.Hold.value);
+		rightFrontMotor.set(CANTalon.SetValueMotionProfile.Hold.value);
+	}
+	
+	public void disableMotionProfile() {
+		leftFrontMotor.set(CANTalon.SetValueMotionProfile.Disable.value);
+		rightFrontMotor.set(CANTalon.SetValueMotionProfile.Disable.value);
+	}
+	
+	public void setMotorsInchesPerSecondOpenLoop(double left, double right) {
+		double leftSpeed = left / 63;
+		double rightSpeed = 1 * right / 63;
+		
+		setMotors(leftSpeed, rightSpeed);
+	}
 }
 
